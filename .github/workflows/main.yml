@@ -24,6 +24,9 @@ jobs:
         ports:
           - 3306
     steps:
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
       - name: Donwload Drupal
         run: |
           git clone --branch ${{ matrix.drupal-version }} ${{env.DRUPAL_REPO}} drupal --depth 1
