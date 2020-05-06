@@ -1,20 +1,14 @@
 name: Running tests
 on: [push, pull_request]
-strategy:
-  matrix:
-    os: [macos-latest, windows-latest, ubuntu-18.04]
-    drupal_version: [8.7.x, 8.8.x]
-    exclude:
-      # excludes node 4 on macOS
-      - os: macos-latest
-        node: 4
 env:
   MODULE_NAME: handlebars_theme_handler
   DRUPAL_REPO: https://git.drupalcode.org/project/drupal.git
-  DRUPAL_VERSION: 8.8.x
 jobs:
   phpunit:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        drupal_version: [8.7.x, 8.8.x]
     services:
       mysql:
         image: mysql:5.7
@@ -26,7 +20,7 @@ jobs:
     steps:
       - name: Donwload Drupal
         run: |
-          git clone --branch ${{env.DRUPAL_VERSION}} ${{env.DRUPAL_REPO}} drupal --depth 1
+          git clone --branch ${{ matrix.drupal_version }} ${{env.DRUPAL_REPO}} drupal --depth 1
       - uses: actions/checkout@v2
         with:
           path: drupal/modules/${{env.MODULE_NAME}}
