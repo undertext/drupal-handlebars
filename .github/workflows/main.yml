@@ -24,9 +24,13 @@ jobs:
         ports:
           - 3306
     steps:
+      - name: Donwload Drupal
+        run: |
+          git clone --branch ${{ matrix.drupal_version }} ${{env.DRUPAL_REPO}} drupal --depth 1
       - name: Get Composer Cache Directory
         id: composer-cache
         run: |
+          cd drupal
           composer config cache-files-dir
           echo "::set-output name=dir::$(composer config cache-files-dir)"
       - uses: actions/cache@v1
@@ -35,9 +39,6 @@ jobs:
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-composer-
-      - name: Donwload Drupal
-        run: |
-          git clone --branch ${{ matrix.drupal_version }} ${{env.DRUPAL_REPO}} drupal --depth 1
       - uses: actions/checkout@v2
         with:
           path: drupal/modules/${{env.MODULE_NAME}}
