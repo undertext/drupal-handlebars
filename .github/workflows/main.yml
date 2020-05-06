@@ -34,7 +34,6 @@ jobs:
         id: composer-cache
         run: |
           cd drupal
-          composer config cache-files-dir
           echo "::set-output name=dir::$(composer config cache-files-dir)"
       - uses: actions/cache@v1
         with:
@@ -49,11 +48,8 @@ jobs:
         run: |
           composer config --global discard-changes true
           composer global require drush/drush:~8.1
-          composer global require squizlabs/php_codesniffer
-          composer global require drupal/coder
           echo "export PATH=$HOME/.composer/vendor/bin:$PATH" >> ~/.bash_profile
           source ~/.bash_profile
-          phpcs --config-set installed_paths ~/.composer/vendor/drupal/coder/coder_sniffer
           cd drupal
           composer config repositories.custom_module path modules/${{env.MODULE_NAME}}
           composer require drupal/${{env.MODULE_NAME}}
@@ -64,9 +60,6 @@ jobs:
           cd drupal
           drush --yes site-install standard --db-url="mysql://root@127.0.0.1:${{job.services.mysql.ports[3306]}}/drupal"
           drush --yes en ${{env.MODULE_NAME}}
-      - name: Run code standards check
-        shell: bash -l {0}
-        run: phpcs --report=full --standard=Drupal --warning-severity=0 drupal/modules/${{env.MODULE_NAME}}
       - name: Run PhpUnit tests
         shell: bash -l {0}
         run: |
